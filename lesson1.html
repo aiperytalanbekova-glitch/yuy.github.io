@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akyuya | Урок: 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', 'Fira Code', monospace;
+            background: radial-gradient(circle at 20% 30%, #0a1f0a, #030803);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(transparent, transparent 39px, rgba(70, 255, 70, 0.04) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(70, 255, 70, 0.04) 40px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .falling-block {
+            position: fixed;
+            font-size: 30px;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            animation: fall 8s linear infinite;
+        }
+
+        @keyframes fall {
+            from { transform: translateY(-100px) rotate(0deg); }
+            to { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .lesson-block {
+            background: rgba(8, 20, 6, 0.94);
+            backdrop-filter: blur(10px);
+            border-radius: 48px;
+            border: 2px solid #3e9a3e;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 0 2px rgba(80, 255, 80, 0.1), inset 0 1px 0 rgba(120,255,120,0.15);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .lesson-header {
+            background: #0a130a;
+            padding: 20px 28px;
+            border-bottom: 2px solid #5eff5e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: #1a2e1a;
+            border: 1px solid #6bc96b;
+            padding: 10px 28px;
+            border-radius: 60px;
+            color: #cdffcd;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 14px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: #2a4a2a;
+            transform: translateX(-3px);
+            border-color: #aaffaa;
+        }
+
+        .xp-badge {
+            background: #1f401f;
+            padding: 8px 20px;
+            border-radius: 60px;
+            color: #f5cb5c;
+            font-weight: bold;
+            border: 1px solid #f5cb5c;
+            font-size: 14px;
+        }
+
+        .xp-badge span {
+            color: white;
+            font-size: 18px;
+        }
+
+        .lesson-content {
+            padding: 35px;
+        }
+
+        .lesson-title {
+            font-size: 28px;
+            color: #baffba;
+            text-shadow: 0 0 5px #2eff2e;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 5px solid #5eff5e;
+            padding-left: 20px;
+        }
+
+        .lesson-description {
+            color: #b7e0b7;
+            line-height: 1.7;
+            margin: 25px 0;
+            font-size: 15px;
+            background: #0c170c;
+            padding: 22px;
+            border-radius: 28px;
+            border: 1px solid #2b732b;
+        }
+
+
+        .quiz-question {
+            background: #0f1d0f;
+            border-radius: 28px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid #4a9e4a;
+        }
+
+        .quiz-question p {
+            font-weight: bold;
+            color: #e5ffe5;
+            margin-bottom: 15px;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            padding: 10px 15px;
+            background: #0a180a;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid #2a5a2a;
+        }
+
+        .quiz-option:hover {
+            background: #1a351a;
+            border-color: #6eff6e;
+        }
+
+        .quiz-option input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #5eff5e;
+        }
+
+        .quiz-option label {
+            color: #cbffcb;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .complete-section {
+            text-align: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px dashed #3e7a3e;
+        }
+
+        .complete-btn {
+            background: linear-gradient(95deg, #1f401f, #0e2a0e);
+            border: 2px solid #5eff5e;
+            padding: 16px 40px;
+            border-radius: 80px;
+            color: #e3ffe3;
+            font-weight: bold;
+            font-size: 20px;
+            font-family: monospace;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .complete-btn:hover {
+            background: #2e5a2e;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px #5eff5e55;
+        }
+
+        .complete-btn:active {
+            transform: scale(0.98);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0e2a0e;
+            border: 2px solid #6eff6e;
+            padding: 14px 32px;
+            border-radius: 60px;
+            color: #dcffdc;
+            font-weight: bold;
+            z-index: 1000;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 0 20px rgba(94,255,94,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .xp-popup {
+            position: fixed;
+            color: #f5cb5c;
+            font-weight: bold;
+            font-size: 24px;
+            text-shadow: 0 0 5px #0f0;
+            pointer-events: none;
+            z-index: 1001;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-80px); }
+        }
+
+        .progress-track {
+            margin: 20px 0 0 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            color: #8bc48b;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            background: #1a2a1a;
+            border-radius: 30px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3ba63b, #8eff8e);
+            width: 0%;
+            height: 100%;
+            border-radius: 30px;
+            transition: width 0.4s;
+        }
+
+        @media (max-width: 600px) {
+            .lesson-content { padding: 20px; }
+            .lesson-title { font-size: 22px; }
+            .complete-btn { font-size: 16px; padding: 12px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="falling-block" style="left: 5%; animation-duration: 12s;">◤</div>
+<div class="falling-block" style="left: 15%; animation-duration: 9s; animation-delay: 1s;">◢</div>
+<div class="falling-block" style="left: 30%; animation-duration: 14s; animation-delay: 2s;">◣</div>
+<div class="falling-block" style="left: 60%; animation-duration: 7s;">◥</div>
+<div class="falling-block" style="left: 80%; animation-duration: 11s; animation-delay: 0.5s;">◤</div>
+<div class="falling-block" style="left: 90%; animation-duration: 10s;">◢</div>
+
+<div class="container">
+    <div class="lesson-block">
+        <div class="lesson-header">
+            <button class="back-btn" onclick="goBack()">
+                ◀ НАЗАД
+            </button>
+            <div class="xp-badge">
+                🎁 НАГРАДА: <span>+20 XP</span>
+            </div>
+        </div>
+
+        <div class="lesson-content">
+            <div class="lesson-title">
+                <span>📘</span> УРОК 1: Сложение и вычитание
+            </div>
+
+            <div class="lesson-description">
+    <p>
+    1. Сложение и вычитание
+    </p>
+<p>Объяснение:</p>
+<p>Сложение — это когда мы соединяем два или больше чисел, чтобы получить их сумму.</p>
+<p>Вычитание — это когда мы убираем одно число из другого, чтобы узнать разницу.</p>
+<p>Примеры:</p>
+<p>7 + 5 = 12</p>
+<p>15 − 6 = 9</p>
+
+<p>Задачи:</p>
+
+<p>У Маши было 8 яблок, она купила ещё 7. Сколько яблок стало у Маши?</p>
+<p>В коробке было 20 карандашей. Петя взял 8. Сколько осталось?</p>
+            </div>
+
+
+            <div class="quiz-question" id="quizBlock">
+                <p>🧠 ПРОВЕРЬ СЕБЯ</p>
+                <div class="quiz-option" onclick="selectAnswer(0)">
+                    <input type="radio" name="quiz" id="opt0" value="0">
+                    <label for="opt0">2+2=4</label>
+                </div>
+                <div class="quiz-option" onclick="selectAnswer(1)">
+                    <input type="radio" name="quiz" id="opt1" value="1">
+                    <label for="opt1">2+2=3</label>
+                </div>
+                <div class="quiz-option" onclick="selectAnswer(2)">
+                    <input type="radio" name="quiz" id="opt2" value="2">
+                    <label for="opt2">2+1=4</label>
+                </div>
+                <div id="quizFeedback" style="margin-top: 15px; font-size: 13px; color: #b1e6b1;"></div>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-label">
+                    <span>📖 ПРОГРЕСС УРОКА</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="complete-section">
+                <button class="complete-btn" id="completeLessonBtn">✅ ЗАВЕРШИТЬ УРОК</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    let lessonCompleted = false;
+    let quizAnswered = false;
+    let quizCorrect = false;
+
+    const BASE_XP = 20;
+    const QUIZ_BONUS_XP = 5;
+
+    function updateProgress() {
+        let progress = 0;
+        if (lessonCompleted) progress = 100;
+        else if (quizAnswered) progress = 50;
+        else progress = 0;
+        
+        const fill = document.getElementById("progressFill");
+        const percentSpan = document.getElementById("progressPercent");
+        if (fill) {
+            fill.style.width = progress + "%";
+            percentSpan.innerText = progress + "%";
+        }
+    }
+
+    function selectAnswer(index) {
+        if (lessonCompleted) {
+            showFloatingNotif("⚠️ Урок уже завершён!", false);
+            return;
+        }
+        if (quizAnswered) {
+            showFloatingNotif("📌 Ты уже ответил на вопрос.");
+            return;
+        }
+        
+        const isCorrect = (index === 0); 
+        quizAnswered = true;
+        quizCorrect = isCorrect;
+        
+        const feedbackDiv = document.getElementById("quizFeedback");
+        
+        if (isCorrect) {
+            feedbackDiv.innerHTML = "✅ ВЕРНО!";
+            feedbackDiv.style.color = "#a5ffa5";
+            showFloatingNotif("🎉 +5 XP (бонус за ответ) будет добавлен к уроку!", false);
+        } else {
+            feedbackDiv.innerHTML = "❌ НЕПРАВИЛЬНО. Правильный ответ: 2+2=4";
+            feedbackDiv.style.color = "#ffaeae";
+        }
+        
+        document.querySelectorAll('.quiz-option').forEach(opt => {
+            opt.style.opacity = "0.7";
+            opt.style.cursor = "default";
+        });
+        
+        updateProgress();
+    }
+    
+    function showFloatingNotif(message, isSuccess = true) {
+        const notif = document.createElement("div");
+        notif.className = "notification";
+        notif.style.background = isSuccess ? "#0e2a0e" : "#2a1a0e";
+        notif.style.borderColor = isSuccess ? "#6eff6e" : "#ffaa66";
+        notif.innerText = message;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 2500);
+    }
+    
+    function showXpAnimation(xpAmount) {
+        const popup = document.createElement("div");
+        popup.className = "xp-popup";
+        popup.innerText = `+${xpAmount} XP`;
+        popup.style.left = "50%";
+        popup.style.bottom = "100px";
+        popup.style.transform = "translateX(-50%)";
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 1000);
+    }
+    
+    function completeLesson() {
+        if (lessonCompleted) {
+            showFloatingNotif("⚠️ Ты уже получил XP за этот урок!", false);
+            return;
+        }
+        
+        let totalXpEarned = BASE_XP;
+        if (quizCorrect) {
+            totalXpEarned += QUIZ_BONUS_XP;
+        }
+        
+        lessonCompleted = true;
+        
+        showXpAnimation(totalXpEarned);
+        showFloatingNotif(`✨ УРОК ПРОЙДЕН! Ты получил ${totalXpEarned} XP ✨`);
+        
+        updateProgress();
+        
+        const btn = document.getElementById("completeLessonBtn");
+        btn.innerHTML = "✅ УРОК ЗАВЕРШЁН";
+        btn.style.opacity = "0.7";
+        btn.style.cursor = "default";
+        btn.disabled = true;
+        
+        addXpToCurrentUser(totalXpEarned);
+    }
+    
+    function addXpToCurrentUser(earnedXp) {
+        const sessionUser = localStorage.getItem("currentUser");
+        if (!sessionUser) {
+            console.log("Нет сессии, XP не сохранён (ты не авторизован)");
+            return;
+        }
+        
+        let users = JSON.parse(localStorage.getItem("users"));
+        const current = JSON.parse(sessionUser);
+        const userIndex = users.findIndex(u => u.id === current.id);
+        
+        if (userIndex !== -1) {
+            users[userIndex].totalXp = (users[userIndex].totalXp || 0) + earnedXp;
+            const newLevel = calculateLevel(users[userIndex].totalXp);
+            users[userIndex].level = newLevel;
+            // увеличиваем счётчик уроков, если завершаем впервые
+            if (!lessonCompleted) {
+                users[userIndex].lessonsCompleted = (users[userIndex].lessonsCompleted || 0) + 1;
+            }
+            localStorage.setItem("users", JSON.stringify(users));
+            
+            // обновляем сессию
+            localStorage.setItem("currentUser", JSON.stringify({
+                id: users[userIndex].id,
+                username: users[userIndex].username,
+                role: users[userIndex].role,
+                totalXp: users[userIndex].totalXp
+            }));
+            console.log(`✅ +${earnedXp} XP для пользователя ${users[userIndex].username}`);
+        }
+    }
+    
+    function getXpForLevel(level) {
+        return Math.round(100 * Math.log2(level + 1));
+    }
+    
+    function calculateLevel(totalXp) {
+        let lvl = 1;
+        while (totalXp >= getXpForLevel(lvl + 1)) lvl++;
+        return lvl;
+    }
+    
+    function goBack() {
+        if (document.referrer && document.referrer.includes("dashboard")) {
+            window.location.href = "dashboard.html";
+        } else {
+            window.location.href = "dashboard.html";
+        }
+    }
+    
+    function initLesson() {
+        updateProgress();
+        const btn = document.getElementById("completeLessonBtn");
+        btn.addEventListener("click", completeLesson);
+    }
+    
+    initLesson();
+</script>
+</body>
+</html>

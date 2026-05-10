@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN | Akyuya</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(circle at 20% 10%, #0b1f0b, #020602);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(transparent, transparent 39px, rgba(70, 255, 70, 0.04) 40px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .admin-panel {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(8, 20, 6, 0.94);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            border: 2px solid #3e9a3e;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+        .header {
+            background: #0a130a;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #5eff5e;
+        }
+        .header h1 {
+            color: #baffba;
+            letter-spacing: 3px;
+            font-size: 1.5rem;
+        }
+        .back-btn {
+            background: #1a2e1a;
+            border: 1px solid #6bc96b;
+            padding: 8px 24px;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            font-family: monospace;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: #2e552e;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px;
+            padding: 25px;
+            background: #071007;
+            border-bottom: 1px solid #2c642c;
+        }
+        .stat-card {
+            background: #0f1c0f;
+            border-radius: 24px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #429642;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #9eff9e;
+        }
+        .stat-label {
+            color: #8bc48b;
+            font-size: 12px;
+        }
+        .toolbar {
+            padding: 20px 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2b582b;
+        }
+        .search-box input {
+            background: #0c1a0c;
+            border: 1px solid #368036;
+            padding: 10px 20px;
+            border-radius: 60px;
+            color: #d0ffd0;
+            width: 260px;
+            font-family: monospace;
+            outline: none;
+        }
+        .search-box input:focus {
+            border-color: #5eff5e;
+        }
+        .btn {
+            background: #1f401f;
+            border: 1px solid #7bef7b;
+            padding: 10px 24px;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .btn-danger {
+            background: #3a1a1a;
+            border-color: #ff6e6e;
+        }
+        .btn-danger:hover {
+            background: #5a2a2a;
+        }
+        .btn:hover {
+            background: #2e5a2e;
+            transform: translateY(-2px);
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 20px 30px 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #102010;
+            color: #b7f0b7;
+            border-bottom: 2px solid #438e43;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #2a542a;
+            color: #c6e6c6;
+        }
+        .role-badge {
+            background: #264d26;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            display: inline-block;
+        }
+        .role-admin {
+            background: #7a4c1c;
+            color: #ffe1a0;
+        }
+        .action-btn {
+            background: #1a331a;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 0 3px;
+            cursor: pointer;
+            color: #c6ffc6;
+            font-size: 14px;
+            transition: 0.1s;
+        }
+        .action-btn:hover {
+            background: #2e552e;
+            transform: scale(1.02);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: #0f1a0f;
+            border-radius: 32px;
+            max-width: 480px;
+            width: 90%;
+            padding: 28px;
+            border: 1px solid #5bb85b;
+        }
+        .modal-card h3 {
+            color: #acffac;
+            margin-bottom: 20px;
+        }
+        .modal-card input, .modal-card select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #071007;
+            border: 1px solid #3e8e3e;
+            border-radius: 24px;
+            color: #e2ffe2;
+            font-family: monospace;
+            outline: none;
+        }
+        .modal-card input:focus, .modal-card select:focus {
+            border-color: #7eff7e;
+        }
+        .modal-card button {
+            width: 100%;
+            padding: 12px;
+            background: #2a5e2a;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-card button:hover {
+            background: #3e7e3e;
+        }
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: #88aa88;
+            transition: 0.1s;
+        }
+        .close-modal:hover {
+            color: #ccffcc;
+        }
+        .notify {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #0e2a0e;
+            border-left: 5px solid #6eff6e;
+            padding: 12px 24px;
+            border-radius: 20px;
+            color: #dcffdc;
+            z-index: 1100;
+            animation: slideIn 0.2s ease;
+            font-family: monospace;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .empty-row td {
+            text-align: center;
+            padding: 50px;
+            color: #6a8e6a;
+        }
+        .xp-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .xp-input-group input {
+            flex: 1;
+        }
+        .xp-preset {
+            background: #1e3a1e;
+            border: 1px solid #5fb85f;
+            padding: 8px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+        }
+        .xp-preset:hover {
+            background: #2e5a2e;
+        }
+        .refresh-btn {
+            background: #2a4a2a;
+            border: 1px solid #6bc96b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-panel">
+    <div class="header">
+        <h1>🎮 АДМИН-ПАНЕЛЬ [Akyuya]</h1>
+        <button class="back-btn" onclick="goToDashboard()">◀ НА ГЛАВНУЮ</button>
+    </div>
+
+    <div class="stats" id="statsPanel">
+        <div class="stat-card"><div class="stat-number" id="statUsers">0</div><div class="stat-label">👥 ПОЛЬЗОВАТЕЛЕЙ</div></div>
+        <div class="stat-card"><div class="stat-number" id="statXp">0</div><div class="stat-label">💎 ВСЕГО XP</div></div>
+        <div class="stat-card"><div class="stat-number" id="statLessons">0</div><div class="stat-label">📖 ВСЕГО УРОКОВ</div></div>
+        <div class="stat-card"><div class="stat-number" id="statBadges">0</div><div class="stat-label">🏅 ВСЕГО БЕЙДЖЕЙ</div></div>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Поиск по имени..." onkeyup="filterUsers()">
+        </div>
+        <button class="btn" onclick="openCreateModal()">➕ СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ</button>
+        <button class="btn refresh-btn" onclick="forceRefresh()">🔄 ОБНОВИТЬ</button>
+        <button class="btn btn-danger" onclick="clearAllUsers()">🗑️ ОЧИСТИТЬ ВСЕХ</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>ID</th><th>ИМЯ</th><th>EMAIL</th><th>РОЛЬ</th><th>XP</th><th>УРОВЕНЬ</th><th>УРОКИ</th><th>БЕЙДЖИ</th><th>ДЕЙСТВИЯ</th></tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="userModal" class="modal">
+    <div class="modal-card">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle">📝 НОВЫЙ ПОЛЬЗОВАТЕЛЬ</h3>
+        <input type="text" id="modalUsername" placeholder="Имя пользователя" autocomplete="off">
+        <input type="email" id="modalEmail" placeholder="Email">
+        <input type="password" id="modalPassword" placeholder="Пароль" value="123456">
+        <select id="modalRole">
+            <option value="user">👤 Пользователь</option>
+            <option value="admin">👑 Администратор</option>
+        </select>
+        <input type="number" id="modalXp" placeholder="XP" value="0">
+        <input type="number" id="modalLessons" placeholder="Пройдено уроков" value="0">
+        <button onclick="saveUser()">💾 СОХРАНИТЬ</button>
+    </div>
+</div>
+
+<div id="xpModal" class="modal">
+    <div class="modal-card">
+        <span class="close-modal" onclick="closeXpModal()">&times;</span>
+        <h3>🎁 НАЧИСЛИТЬ XP</h3>
+        <input type="text" id="xpUserName" readonly style="background:#1d2e1d;">
+        <div class="xp-input-group">
+            <input type="number" id="xpAmount" placeholder="Количество XP" value="50">
+        </div>
+        <div style="display: flex; gap: 10px; margin: 10px 0;">
+            <div class="xp-preset" onclick="setXpPreset(25)">+25</div>
+            <div class="xp-preset" onclick="setXpPreset(50)">+50</div>
+            <div class="xp-preset" onclick="setXpPreset(100)">+100</div>
+            <div class="xp-preset" onclick="setXpPreset(250)">+250</div>
+        </div>
+        <button onclick="addXp()">➕ НАЧИСЛИТЬ</button>
+    </div>
+</div>
+
+<script>
+    let allUsers = [];
+    let currentEditId = null;
+    let currentXpId = null;
+
+    function getXpForLevel(level) {
+        return Math.round(100 * Math.log2(level + 1));
+    }
+
+    function calculateLevel(totalXp) {
+        let level = 1;
+        while (totalXp >= getXpForLevel(level + 1)) {
+            level++;
+        }
+        return level;
+    }
+
+    // Обновление уровня у пользователя на основе XP
+    function updateUserLevel(user) {
+        const newLevel = calculateLevel(user.totalXp || 0);
+        if (user.level !== newLevel) {
+            user.level = newLevel;
+            return true;
+        }
+        return false;
+    }
+
+    function loadUsers() {
+        const stored = localStorage.getItem("users");
+        if (!stored || stored === "undefined") {
+            const defaultUsers = [
+                {
+                    id: 1,
+                    username: "Админ",
+                    email: "admin@edutracker.com",
+                    password: "Админ12345",
+                    role: "admin",
+                    totalXp: 1420,
+                    level: 5,
+                    lessonsCompleted: 28,
+                    badgesEarned: [1, 2, 3, 4],
+                    xpHistory: [1200, 1250, 1300, 1350, 1400, 1410, 1420],
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    username: "user",
+                    email: "user@example.com",
+                    password: "user123",
+                    role: "user",
+                    totalXp: 490,
+                    level: 3,
+                    lessonsCompleted: 7,
+                    badgesEarned: [1],
+                    xpHistory: [100, 200, 300, 380, 440, 470, 490],
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem("users", JSON.stringify(defaultUsers));
+            allUsers = defaultUsers;
+        } else {
+            allUsers = JSON.parse(stored);
+            let changed = false;
+            allUsers.forEach(user => {
+                if (updateUserLevel(user)) changed = true;
+            });
+            if (changed) {
+                saveUsers();
+            }
+        }
+        renderTable();
+        updateStats();
+    }
+
+    function saveUsers() {
+        localStorage.setItem("users", JSON.stringify(allUsers));
+        const sessionRaw = localStorage.getItem("currentUser");
+        if (sessionRaw) {
+            try {
+                const sessionUser = JSON.parse(sessionRaw);
+                const updatedSession = allUsers.find(u => u.id === sessionUser.id);
+                if (updatedSession) {
+                    localStorage.setItem("currentUser", JSON.stringify({
+                        id: updatedSession.id,
+                        username: updatedSession.username,
+                        role: updatedSession.role,
+                        totalXp: updatedSession.totalXp,
+                        level: updatedSession.level
+                    }));
+                }
+            } catch(e) {}
+        }
+    }
+
+    function forceRefresh() {
+        loadUsers();
+        showNotify("🔄 Список пользователей обновлён", false);
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById("usersTable");
+        if (!tbody) return;
+        
+        const searchTerm = document.getElementById("searchInput")?.value.toLowerCase() || "";
+        const filtered = allUsers.filter(u => u && u.username && u.username.toLowerCase().includes(searchTerm));
+        
+        if (!filtered || filtered.length === 0) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="9">😔 Нет пользователей. Нажми "СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ"</td></tr>`;
+            return;
+        }
+        
+        tbody.innerHTML = "";
+        filtered.forEach(user => {
+            const level = user.level || calculateLevel(user.totalXp || 0);
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td style="font-size:12px;">${user.id}</td>
+                <td><strong>${escapeHtml(user.username)}</strong></td>
+                <td>${escapeHtml(user.email || '-')}</td>
+                <td><span class="role-badge ${user.role === 'admin' ? 'role-admin' : ''}">${user.role === 'admin' ? '🔐 АДМИН' : '🎮 ЮЗЕР'}</span></td>
+                <td>${user.totalXp || 0}</td>
+                <td>⭐ ${level}</td>
+                <td>📘 ${user.lessonsCompleted || 0}</td>
+                <td>🏅 ${(user.badgesEarned || []).length}</td>
+                <td>
+                    <button class="action-btn" onclick="openXpModal(${user.id})" title="Начислить XP">🎁</button>
+                    <button class="action-btn" onclick="editUser(${user.id})" title="Редактировать">✏️</button>
+                    <button class="action-btn" onclick="deleteUser(${user.id})" title="Удалить">🗑️</button>
+                </td>
+            `;
+        });
+    }
+
+    function updateStats() {
+        document.getElementById("statUsers").innerText = allUsers.length;
+        const totalXp = allUsers.reduce((sum, u) => sum + (u.totalXp || 0), 0);
+        const totalLessons = allUsers.reduce((sum, u) => sum + (u.lessonsCompleted || 0), 0);
+        const totalBadges = allUsers.reduce((sum, u) => sum + (u.badgesEarned || []).length, 0);
+        document.getElementById("statXp").innerText = totalXp;
+        document.getElementById("statLessons").innerText = totalLessons;
+        document.getElementById("statBadges").innerText = totalBadges;
+    }
+
+    function filterUsers() {
+        renderTable();
+    }
+
+    function openCreateModal() {
+        currentEditId = null;
+        document.getElementById("modalTitle").innerText = "📝 НОВЫЙ ПОЛЬЗОВАТЕЛЬ";
+        document.getElementById("modalUsername").value = "";
+        document.getElementById("modalEmail").value = "";
+        document.getElementById("modalPassword").value = "123456";
+        document.getElementById("modalRole").value = "user";
+        document.getElementById("modalXp").value = "0";
+        document.getElementById("modalLessons").value = "0";
+        document.getElementById("userModal").style.display = "flex";
+    }
+
+    function editUser(id) {
+        const user = allUsers.find(u => u.id === id);
+        if (!user) return;
+        currentEditId = id;
+        document.getElementById("modalTitle").innerText = "✏️ РЕДАКТИРОВАНИЕ";
+        document.getElementById("modalUsername").value = user.username;
+        document.getElementById("modalEmail").value = user.email || "";
+        document.getElementById("modalPassword").value = user.password || "";
+        document.getElementById("modalRole").value = user.role;
+        document.getElementById("modalXp").value = user.totalXp || 0;
+        document.getElementById("modalLessons").value = user.lessonsCompleted || 0;
+        document.getElementById("userModal").style.display = "flex";
+    }
+
+    function saveUser() {
+        const username = document.getElementById("modalUsername").value.trim();
+        const email = document.getElementById("modalEmail").value.trim();
+        const password = document.getElementById("modalPassword").value;
+        const role = document.getElementById("modalRole").value;
+        let xp = parseInt(document.getElementById("modalXp").value) || 0;
+        const lessons = parseInt(document.getElementById("modalLessons").value) || 0;
+
+        if (!username) {
+            showNotify("❌ Введите имя пользователя!", true);
+            return;
+        }
+        if (!password) {
+            showNotify("❌ Введите пароль!", true);
+            return;
+        }
+
+        if (currentEditId === null) {
+            // Проверка на существующее имя
+            if (allUsers.find(u => u.username === username)) {
+                showNotify("❌ Пользователь с таким именем уже существует", true);
+                return;
+            }
+            const newLevel = calculateLevel(xp);
+            const newUser = {
+                id: Date.now(),
+                username: username,
+                email: email,
+                password: password,
+                role: role,
+                totalXp: xp,
+                level: newLevel,
+                lessonsCompleted: lessons,
+                badgesEarned: [],
+                xpHistory: [xp],
+                createdAt: new Date().toISOString()
+            };
+            allUsers.push(newUser);
+            saveUsers();
+            showNotify(`✅ Пользователь "${username}" создан!`, false);
+        } else {
+            const idx = allUsers.findIndex(u => u.id === currentEditId);
+            if (idx !== -1) {
+                if (allUsers.some(u => u.username === username && u.id !== currentEditId)) {
+                    showNotify("❌ Имя уже занято другим пользователем", true);
+                    return;
+                }
+                allUsers[idx].username = username;
+                allUsers[idx].email = email;
+                allUsers[idx].password = password;
+                allUsers[idx].role = role;
+                allUsers[idx].totalXp = xp;
+                allUsers[idx].lessonsCompleted = lessons;
+                const newLevel = calculateLevel(xp);
+                allUsers[idx].level = newLevel;
+                saveUsers();
+                showNotify(`✏️ Пользователь "${username}" обновлён`, false);
+            }
+        }
+        closeModal();
+        renderTable();
+        updateStats();
+    }
+
+    function deleteUser(id) {
+        const user = allUsers.find(u => u.id === id);
+        if (!user) return;
+        if (confirm(`🗑️ УДАЛИТЬ пользователя "${user.username}"? Это действие НЕОБРАТИМО.`)) {
+            allUsers = allUsers.filter(u => u.id !== id);
+            saveUsers();
+            renderTable();
+            updateStats();
+            showNotify(`🗑️ Пользователь "${user.username}" удалён`, false);
+        }
+    }
+
+    function clearAllUsers() {
+        if (confirm("⚠️ ВНИМАНИЕ! Это удалит ВСЕХ пользователей без возможности восстановления. Продолжить?")) {
+            allUsers = [];
+            saveUsers();
+            renderTable();
+            updateStats();
+            showNotify("💀 Все пользователи удалены", false);
+        }
+    }
+
+    function openXpModal(id) {
+        const user = allUsers.find(u => u.id === id);
+        if (!user) return;
+        currentXpId = id;
+        document.getElementById("xpUserName").value = user.username;
+        document.getElementById("xpAmount").value = "50";
+        document.getElementById("xpModal").style.display = "flex";
+    }
+
+    function setXpPreset(amount) {
+        document.getElementById("xpAmount").value = amount;
+    }
+
+    function addXp() {
+        const amount = parseInt(document.getElementById("xpAmount").value);
+        if (isNaN(amount) || amount <= 0) {
+            showNotify("❌ Введите корректное количество XP (больше 0)", true);
+            return;
+        }
+        const idx = allUsers.findIndex(u => u.id === currentXpId);
+        if (idx !== -1) {
+            const oldXp = allUsers[idx].totalXp || 0;
+            const newXp = oldXp + amount;
+            allUsers[idx].totalXp = newXp;
+            
+            const newLevel = calculateLevel(newXp);
+            allUsers[idx].level = newLevel;
+            
+            if (!allUsers[idx].xpHistory) allUsers[idx].xpHistory = [];
+            allUsers[idx].xpHistory.push(newXp);
+            if (allUsers[idx].xpHistory.length > 10) allUsers[idx].xpHistory.shift();
+            
+            saveUsers();
+            renderTable();
+            updateStats();
+            showNotify(`🎉 +${amount} XP для ${allUsers[idx].username}! Новый уровень: ${newLevel}`, false);
+            closeXpModal();
+        }
+    }
+
+    function goToDashboard() {
+        window.location.href = "dashboard.html";
+    }
+
+    function closeModal() {
+        document.getElementById("userModal").style.display = "none";
+    }
+
+    function closeXpModal() {
+        document.getElementById("xpModal").style.display = "none";
+    }
+
+    function showNotify(msg, isError = false) {
+        const n = document.createElement("div");
+        n.className = "notify";
+        n.style.background = isError ? "#2a1212" : "#0e2a0e";
+        n.style.borderLeftColor = isError ? "#ff6e6e" : "#6eff6e";
+        n.innerText = msg;
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 2800);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    window.onclick = function(e) {
+        if (e.target.classList && e.target.classList.contains('modal')) {
+            e.target.style.display = "none";
+        }
+    };
+
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'users') {
+            loadUsers();
+        }
+    });
+
+    loadUsers();
+</script>
+</body>
+</html>
